@@ -1,0 +1,21 @@
+* {
+  box-sizing: border-box;
+}
+
+form {
+  position: relative;
+  width: 300px;
+}
+
+input[type="text"] {
+  width: 100%;
+}
+
+.list {
+  position: absolute;
+  background-color: white;
+  top:100%;
+  left: 0;
+  right: 0;
+  border: 1px solid #ccc;
+}
