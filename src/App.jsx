@@ -1,28 +1,26 @@
-import { useEffect, useMemo, useState } from "react"
+import { useDebounce } from "@uidotdev/usehooks";
+import { useEffect, useState } from "react";
 
 export default function App() {
   const [state, setState] = useState('')
   const [propositions, setPropositions] = useState([])
-
-  const longueurState = useMemo(() => {
-    return state.length
-  }, [state])
+  const debouncedSearchTerm = useDebounce(state, 500);
 
   useEffect(() => {
     const getPropositions = async () => {
-      const response = await fetch('https://api-adresse.data.gouv.fr/search/?q='+state)
+      const response = await fetch('https://api-adresse.data.gouv.fr/search/?q='+debouncedSearchTerm)
       const data = await response.json()
-      if(data.features[0].properties.label === state) {
+      if(data.features[0].properties.label === debouncedSearchTerm) {
         setPropositions([])
       }
       else {
         setPropositions(data.features.map((feature) => feature.properties.label))
       }
     }
-    if(state.length >= 3){
+    if(debouncedSearchTerm.length >= 3){
       getPropositions()
     }
-  }, [state])
+  }, [debouncedSearchTerm])
 
   return (
     <div>
@@ -41,6 +39,8 @@ export default function App() {
           ))}
         </div>
       </form>
+      <h2>Les pommes</h2>
+      <p>Les pommes c&apos;est trop bon en vrai de vrai !</p>
     </div>
   )
 }
