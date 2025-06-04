@@ -1,23 +1,24 @@
-import { useDebounce } from "@uidotdev/usehooks";
+import { useThrottle } from "@uidotdev/usehooks";
 import { useEffect, useState } from "react";
 
 export default function App() {
   const [state, setState] = useState('')
   const [propositions, setPropositions] = useState([])
-  const debouncedSearchTerm = useDebounce(state, 500);
+  const debouncedSearchTerm = useThrottle(state, 500);
+
+  useEffect(() => {
+    if(propositions.length === 1 && propositions[0] === debouncedSearchTerm) {
+      setPropositions([])
+    }
+  }, [debouncedSearchTerm, propositions]);
 
   useEffect(() => {
     const getPropositions = async () => {
       const response = await fetch('https://api-adresse.data.gouv.fr/search/?q='+debouncedSearchTerm)
       const data = await response.json()
-      if(data.features[0].properties.label === debouncedSearchTerm) {
-        setPropositions([])
-      }
-      else {
-        setPropositions(data.features.map((feature) => feature.properties.label))
-      }
+      setPropositions(data.features.map((feature) => feature.properties.label))
     }
-    if(debouncedSearchTerm.length >= 3){
+    if(debouncedSearchTerm.length >= 3 && debouncedSearchTerm.length <= 200) {
       getPropositions()
     }
   }, [debouncedSearchTerm])
@@ -27,7 +28,7 @@ export default function App() {
       <form>
         <input type="text" 
           value={state}
-          onInput={(e) => {
+          onChange={(e) => {
             setState(e.target.value)
           }}
         />
