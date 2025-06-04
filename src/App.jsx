@@ -1,10 +1,18 @@
 import { useThrottle } from "@uidotdev/usehooks";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function App() {
   const [state, setState] = useState('')
   const [propositions, setPropositions] = useState([])
   const debouncedSearchTerm = useThrottle(state, 500);
+
+  const maRef = useRef(null)
+
+  useEffect(() => {
+    if (maRef.current) {
+      maRef.current.focus();
+    }
+  }, []);
 
   useEffect(() => {
     if(propositions.length === 1 && propositions[0] === debouncedSearchTerm) {
@@ -27,6 +35,7 @@ export default function App() {
     <div>
       <form>
         <input type="text" 
+          ref={maRef}
           value={state}
           onChange={(e) => {
             setState(e.target.value)
